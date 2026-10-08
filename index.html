@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="ru" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RunSmart - Подбор пульсометра</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for Social Icons & Arrow -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Montserrat -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            red: '#c70101',
+                            hover: '#a60000',
+                            gray: '#f6f6f6'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Montserrat', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Card Flip 3D effect */
+        .perspective-1000 {
+            perspective: 1000px;
+        }
+        .transform-style-3d {
+            transform-style: preserve-3d;
+            transition: transform 0.6s ease-in-out;
+        }
+        .backface-hidden {
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+        .rotate-y-180 {
+            transform: rotateY(180deg);
+        }
+        .flipped {
+            transform: rotateY(180deg);
+        }
+
+        /* Эффект бегущего блика на кнопках */
+        .btn-shine {
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-shine::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -60%;
+            width: 20%;
+            height: 200%;
+            background: rgba(255, 255, 255, 0.25);
+            transform: rotate(30deg);
+            transition: all 0.6s ease;
+        }
+        .btn-shine:hover::after {
+            left: 120%;
+        }
+    </style>
+</head>
+<body id="top" class="font-sans text-[#0d0d0d] bg-white selection:bg-brand-red selection:text-white antialiased relative">
+
+    <!-- HEADER & MAIN HERO SECTION -->
+    <section class="relative bg-cover bg-center text-white min-h-[650px] flex flex-col justify-between py-5" style="background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('bg.jpg');">
+        <div class="max-w-5xl mx-auto px-4 w-full">
+            
+            <!-- Top Navbar Line -->
+            <header class="flex flex-col md:flex-row items-center justify-between gap-4">
+                <!-- Logo -->
+                <a href="#" class="flex items-center gap-3 group">
+                    <img src="running-man-2-64.png" alt="RunSmart Logo" class="h-11 w-auto object-contain transition-transform group-hover:scale-105">
+                    <div class="text-center md:text-left">
+                        <span class="block text-2xl font-black tracking-wide leading-none"></span>
+                        <span data-i18n="logo_subtitle" class="text-xs font-normal text-gray-200 mt-1 block"></span>
+                    </div>
+                </a>
+
+                <!-- Official Representative Subtitle -->
+                <div class="hidden lg:block text-center text-sm font-medium leading-tight">
+                    <span data-i18n="official_rep">Официальный представитель</span><br>
+                    <span class="font-bold text-base">Garmin, Polar, Suunto</span>
+                </div>
+
+                <!-- Language Switcher & Call Button -->
+                <div class="flex flex-col md:flex-row items-center gap-3 md:gap-5">
+                    <!-- LANGUAGE SWITCHER (RU / EN / KK) -->
+                    <div class="flex items-center bg-black/40 backdrop-blur-md p-1 rounded-full border border-white/20 text-xs font-bold">
+                        <button type="button" onclick="setLanguage('ru')" id="lang-ru" class="lang-btn px-2.5 py-1 rounded-full bg-brand-red text-white transition-all duration-300">RU</button>
+                        <button type="button" onclick="setLanguage('en')" id="lang-en" class="lang-btn px-2.5 py-1 rounded-full text-gray-300 hover:text-white transition-all duration-300">EN</button>
+                        <button type="button" onclick="setLanguage('kk')" id="lang-kk" class="lang-btn px-2.5 py-1 rounded-full text-gray-300 hover:text-white transition-all duration-300">KK</button>
+                    </div>
+
+                    <!-- Phone & Callback Button -->
+                    <div class="flex flex-col items-center md:items-end">
+                        <a href="tel:+74999228974" class="text-lg md:text-xl font-bold hover:text-brand-red transition-colors">+7 (499) 922-89-74</a>
+                        <button type="button" onclick="openModal('call')" data-i18n="btn_call" class="btn-shine mt-1 bg-gradient-to-r from-brand-red to-red-600 hover:from-brand-hover hover:to-red-700 text-white text-xs font-bold uppercase tracking-wider px-5 py-2 rounded-md transition-all duration-300 shadow-md hover:shadow-red-500/40 hover:-translate-y-0.5 active:translate-y-0 active:scale-95">
+                            заказать звонок
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Main Banner Content -->
+            <div class="mt-14 md:mt-20 flex flex-col items-center md:items-end text-center md:text-right">
+                <h1 data-i18n="main_title" class="text-3xl sm:text-4xl md:text-5xl font-black uppercase tracking-tight leading-none">
+                    Подбор пульсометра
+                </h1>
+                <h2 data-i18n="main_subtitle" class="text-lg sm:text-xl md:text-2xl font-medium uppercase mt-3 tracking-wide text-gray-100">
+                    с учетом вашего уровня подготовки
+                </h2>
+
+                <!-- 3 Top Features Icons -->
+                <div class="mt-10 grid grid-cols-3 gap-4 md:gap-8 max-w-lg w-full text-center">
+                    <div class="flex flex-col items-center">
+                        <img src="019_timer_time_stopwatch_2-64.png" alt="Timer Icon" class="h-12 w-12 mb-3 object-contain">
+                        <p data-i18n="feature_1" class="text-xs md:text-sm font-medium leading-tight">Время подбора:<br>10 минут</p>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <img src="app 08 hand cart 64.png" alt="Cart Icon" class="h-12 w-12 mb-3 object-contain">
+                        <p data-i18n="feature_2" class="text-xs md:text-sm font-medium leading-tight">Бесплатная<br>доставка</p>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <img src="messages 64.png" alt="Messages Icon" class="h-12 w-12 mb-3 object-contain">
+                        <p data-i18n="feature_3" class="text-xs md:text-sm font-medium leading-tight">Ответим<br>на все вопросы</p>
+                    </div>
+                </div>
+
+                <!-- Главная CTA Кнопка -->
+                <button type="button" onclick="openModal('consult')" data-i18n="btn_consult" class="btn-shine mt-10 bg-gradient-to-r from-brand-red via-red-600 to-brand-red bg-[length:200%_auto] hover:bg-right text-white text-sm md:text-base font-bold uppercase tracking-wider px-8 py-4 rounded-lg transition-all duration-500 shadow-xl shadow-red-900/40 hover:shadow-red-600/50 hover:-translate-y-1 active:translate-y-0 active:scale-95">
+                    заказать консультацию
+                </button>
+                
+                <p class="mt-3 text-xs md:text-sm text-gray-300 font-medium">
+                    <span data-i18n="or">или</span> <a href="#catalog" data-i18n="go_to_catalog" class="underline hover:text-white transition-colors uppercase">перейти в каталог</a>
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ADVANTAGES SECTION -->
+    <section class="py-16 md:py-20 bg-brand-gray">
+        <div class="max-w-5xl mx-auto px-4">
+            <h2 data-i18n="advantages_title" class="text-2xl md:text-3xl font-bold text-center uppercase tracking-wide mb-12 md:mb-16">
+                НАШИ ПРЕИМУЩЕСТВА
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-10 text-center">
+                <div class="flex flex-col items-center">
+                    <img src="cup.png" alt="Cup Icon" class="h-16 w-16 mb-6 object-contain">
+                    <h3 data-i18n="adv_1_title" class="text-lg font-bold mb-3">Делимся опытом</h3>
+                    <p data-i18n="adv_1_text" class="text-sm text-gray-600 leading-relaxed font-normal">
+                        Наши сотрудники имеют опыт бега на марафонах или в триатлоне, поэтому они изнутри знают всё о пульсометрах и помогут сделать правильный выбор.
+                    </p>
+                </div>
+                <div class="flex flex-col items-center">
+                    <img src="heart.png" alt="Heart Pulse Icon" class="h-16 w-16 mb-6 object-contain">
+                    <h3 data-i18n="adv_2_title" class="text-lg font-bold mb-3">Заботимся о здоровье</h3>
+                    <p data-i18n="adv_2_text" class="text-sm text-gray-600 leading-relaxed font-normal">
+                        Мы работаем для того, чтобы ваши занятия спортом шли на пользу вашему здоровью и приносили радость вам и вашим близким!
+                    </p>
+                </div>
+                <div class="flex flex-col items-center">
+                    <img src="shoe.png" alt="Shoe Icon" class="h-16 w-16 mb-6 object-contain">
+                    <h3 data-i18n="adv_3_title" class="text-lg font-bold mb-3">Учим бегать</h3>
+                    <p data-i18n="adv_3_text" class="text-sm text-gray-600 leading-relaxed font-normal">
+                        Помогаем с обучением правильной технике бега! Дружим с крупнейшей школой бега - I LOVE RUNNING.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CONSULTATION FORM SECTION (ВОЗВРАЩЕНО) -->
+    <section class="py-16 md:py-20 bg-cover bg-center text-white relative" style="background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('bg2.jpg');">
+        <div class="max-w-5xl mx-auto px-4">
+            <div class="max-w-xl text-left">
+                <h2 data-i18n="form_title" class="text-2xl sm:text-3xl md:text-4xl font-bold uppercase leading-tight mb-4">
+                    ПОЛУЧИТЕ БЕСПЛАТНУЮ КОНСУЛЬТАЦИЮ<br>ПО ПОДБОРУ ПУЛЬСОМЕТРА
+                </h2>
+                <p data-i18n="form_subtitle" class="text-base sm:text-lg text-gray-200 mb-8 font-medium">
+                    Просто заполните форму заявки<br>и мы перезвоним вам в течении 10 минут
+                </p>
+                <form onsubmit="handleSubmit(event)" class="flex flex-col gap-4 max-w-sm">
+                    <input type="text" placeholder="Ваше имя" required class="px-5 py-3.5 rounded-md text-gray-800 focus:outline-none focus:ring-2 focus:ring-brand-red text-sm font-medium shadow-inner">
+                    <input type="tel" placeholder="Ваш телефон" required class="px-5 py-3.5 rounded-md text-gray-800 focus:outline-none focus:ring-2 focus:ring-brand-red text-sm font-medium shadow-inner">
+                    <input type="email" placeholder="Ваш E-mail" required class="px-5 py-3.5 rounded-md text-gray-800 focus:outline-none focus:ring-2 focus:ring-brand-red text-sm font-medium shadow-inner">
+                    
+                    <button type="submit" data-i18n="btn_consult" class="btn-shine mt-2 bg-gradient-to-r from-brand-red to-red-600 hover:from-brand-hover hover:to-red-700 text-white text-sm font-bold uppercase tracking-wider py-4 rounded-md transition-all duration-300 shadow-lg shadow-red-600/30 hover:shadow-red-600/50 hover:-translate-y-0.5 active:translate-y-0 active:scale-95">
+                        заказать консультацию
+                    </button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- SLIDER SECTION (ВОЗВРАЩЕНО) -->
+    <section class="py-16 bg-white overflow-hidden">
+        <div class="max-w-4xl mx-auto px-4 relative flex items-center justify-center">
+            <button id="prevBtn" onclick="moveSlide(-1)" class="absolute left-2 md:left-4 z-10 p-3 bg-white/80 hover:bg-white text-gray-800 rounded-full shadow-md hover:shadow-lg hover:scale-110 active:scale-95 transition-all duration-200 border border-gray-100 focus:outline-none">
+                <i class="fas fa-chevron-left text-lg md:text-xl text-brand-red"></i>
+            </button>
+            <div class="w-full max-w-2xl overflow-hidden rounded-lg">
+                <div id="sliderTrack" class="flex transition-transform duration-500 ease-in-out">
+                    <div class="min-w-full flex justify-center items-center p-4">
+                        <img src="Слайд №1.png" alt="Polar RC3 GPS Slide 1" class="max-h-[350px] md:max-h-[420px] object-contain">
+                    </div>
+                    <div class="min-w-full flex justify-center items-center p-4">
+                        <img src="photo.png" alt="Polar FT1 Slide 2" class="max-h-[350px] md:max-h-[420px] object-contain">
+                    </div>
+                    <div class="min-w-full flex justify-center items-center p-4">
+                        <img src="Слайд №1.png" alt="Polar RC3 GPS Slide 3" class="max-h-[350px] md:max-h-[420px] object-contain">
+                    </div>
+                </div>
+            </div>
+            <button id="nextBtn" onclick="moveSlide(1)" class="absolute right-2 md:right-4 z-10 p-3 bg-white/80 hover:bg-white text-gray-800 rounded-full shadow-md hover:shadow-lg hover:scale-110 active:scale-95 transition-all duration-200 border border-gray-100 focus:outline-none">
+                <i class="fas fa-chevron-right text-lg md:text-xl text-brand-red"></i>
+            </button>
+        </div>
+    </section>
+
+    <!-- CATALOG SECTION -->
+    <section id="catalog" class="py-16 bg-white">
+        <div class="max-w-5xl mx-auto px-4">
+            <h2 data-i18n="catalog_title" class="text-2xl md:text-3xl font-bold text-center uppercase tracking-wide mb-8">
+                КАТАЛОГ ПУЛЬСОМЕТРОВ
+            </h2>
+            
+            <div class="flex flex-wrap justify-center gap-3 sm:gap-4 mb-12">
+                <button type="button" onclick="switchTab('fitness')" id="tab-fitness" class="tab-btn bg-gradient-to-r from-brand-red to-red-600 text-white -skew-x-12 px-6 py-3 text-xs sm:text-sm font-bold uppercase transition-all duration-300 shadow-md shadow-red-500/20 hover:-translate-y-0.5">
+                    <span data-i18n="tab_fitness" class="block skew-x-12">Для фитнеса</span>
+                </button>
+                <button type="button" onclick="switchTab('running')" id="tab-running" class="tab-btn border-2 border-gray-300 text-gray-500 -skew-x-12 px-6 py-3 text-xs sm:text-sm font-bold uppercase hover:bg-gray-100 hover:border-gray-400 hover:text-gray-700 transition-all duration-300 hover:-translate-y-0.5">
+                    <span data-i18n="tab_running" class="block skew-x-12">Для бега</span>
+                </button>
+                <button type="button" onclick="switchTab('triathlon')" id="tab-triathlon" class="tab-btn border-2 border-gray-300 text-gray-500 -skew-x-12 px-6 py-3 text-xs sm:text-sm font-bold uppercase hover:bg-gray-100 hover:border-gray-400 hover:text-gray-700 transition-all duration-300 hover:-translate-y-0.5">
+                    <span data-i18n="tab_triathlon" class="block skew-x-12">Для триатлона</span>
+                </button>
+            </div>
+
+            <!-- Tab Content Container -->
+            <div id="catalogGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                
+                <!-- === ФИТНЕС КАРТОЧКА 1 === -->
+                <div class="card-item fitness border-2 border-gray-100 hover:border-gray-300 p-5 rounded-xl perspective-1000 bg-white transition-all duration-300 hover:shadow-xl">
+                    <div class="card-inner relative transition-transform duration-500 transform-style-3d min-h-[440px] flex flex-col justify-between">
+                        <div class="card-front absolute inset-0 backface-hidden flex flex-col justify-between bg-white">
+                            <div class="text-center">
+                                <img src="photo.png" alt="Polar FT1" class="h-48 mx-auto object-contain mb-4">
+                                <h3 class="font-bold text-base mb-1">Polar FT1</h3>
+                                <p data-i18n="card_desc_1" class="text-xs text-gray-500 font-normal px-2">Для первых шагов в тренировках по пульсу</p>
+                            </div>
+                            <div class="mt-4">
+                                <button type="button" onclick="toggleCard(this)" data-i18n="btn_more" class="block mx-auto text-brand-red text-xs font-bold underline uppercase hover:text-brand-hover transition-colors mb-4">ПОДРОБНЕЕ</button>
+                                <hr class="my-3 border-gray-100">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <div class="text-xs text-gray-400 line-through">4 750 руб.</div>
+                                        <div class="text-base font-bold text-gray-900">4 500 руб.</div>
+                                    </div>
+                                    <button type="button" onclick="openModal('buy', 'Polar FT1')" data-i18n="btn_buy" class="btn-shine bg-brand-red hover:bg-brand-hover text-white text-xs font-bold uppercase px-5 py-2.5 rounded-md transition-all duration-300 shadow hover:shadow-md hover:shadow-red-500/30 active:scale-95">КУПИТЬ</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-back absolute inset-0 backface-hidden rotate-y-180 flex flex-col justify-between bg-white p-2">
+                            <ul class="text-xs text-gray-600 space-y-2 list-disc pl-4 leading-relaxed font-medium">
+                                <li>Звуковое оповещение о целевой зоне</li>
+                                <li>Графический индикатор пульса</li>
+                                <li>Расчет расхода калорий</li>
+                            </ul>
+                            <div class="mt-4">
+                                <button type="button" onclick="toggleCard(this)" data-i18n="btn_back" class="block mx-auto text-brand-red text-xs font-bold underline uppercase hover:text-brand-hover transition-colors mb-4">НАЗАД</button>
+                                <hr class="my-3 border-gray-100">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <div class="text-xs text-gray-400 line-through">4 750 руб.</div>
+                                        <div class="text-base font-bold text-gray-900">4 500 руб.</div>
+                                    </div>
+                                    <button type="button" onclick="openModal('buy', 'Polar FT1')" data-i18n="btn_buy" class="btn-shine bg-brand-red hover:bg-brand-hover text-white text-xs font-bold uppercase px-5 py-2.5 rounded-md transition-all duration-300 shadow hover:shadow-md hover:shadow-red-500/30 active:scale-95">КУПИТЬ</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- === ФИТНЕС КАРТОЧКА 2 === -->
+                <div class="card-item fitness border-2 border-gray-100 hover:border-gray-300 p-5 rounded-xl perspective-1000 bg-white transition-all duration-300 hover:shadow-xl">
+                    <div class="card-inner relative transition-transform duration-500 transform-style-3d min-h-[440px] flex flex-col justify-between">
+                        <div class="card-front absolute inset-0 backface-hidden flex flex-col justify-between bg-white">
+                            <div class="text-center">
+                                <img src="photo.png" alt="Suunto M2" class="h-48 mx-auto object-contain mb-4">
+                                <h3 class="font-bold text-base mb-1">Suunto M2</h3>
+                                <p class="text-xs text-gray-500 font-normal px-2">Удобный пульсометр для фитнес-занятий</p>
+                            </div>
+                            <div class="mt-4">
+                                <button type="button" onclick="toggleCard(this)" data-i18n="btn_more" class="block mx-auto text-brand-red text-xs font-bold underline uppercase hover:text-brand-hover transition-colors mb-4">ПОДРОБНЕЕ</button>
+                                <hr class="my-3 border-gray-100">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <div class="text-xs text-gray-400 line-through">6 900 руб.</div>
+                                        <div class="text-base font-bold text-gray-900">6 641 руб.</div>
+                                    </div>
+                                    <button type="button" onclick="openModal('buy', 'Suunto M2')" data-i18n="btn_buy" class="btn-shine bg-brand-red hover:bg-brand-hover text-white text-xs font-bold uppercase px-5 py-2.5 rounded-md transition-all duration-300 shadow hover:shadow-md hover:shadow-red-500/30 active:scale-95">КУПИТЬ</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-back absolute inset-0 backface-hidden rotate-y-180 flex flex-col justify-between bg-white p-2">
+                            <ul class="text-xs text-gray-600 space-y-2 list-disc pl-4 leading-relaxed font-medium">
+                                <li>Контроль пульса в реальном времени</li>
+                                <li>Подсчет затраченных калорий</li>
+                                <li>Удобный тканевый кардиодатчик</li>
+                            </ul>
+                            <div class="mt-4">
+                                <button type="button" onclick="toggleCard(this)" data-i18n="btn_back" class="block mx-auto text-brand-red text-xs font-bold underline uppercase hover:text-brand-hover transition-colors mb-4">НАЗАД</button>
+                                <hr class="my-3 border-gray-100">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <div class="text-xs text-gray-400 line-through">6 900 руб.</div>
+                                        <div class="text-base font-bold text-gray-900">6 641 руб.</div>
+                                    </div>
+                                    <button type="button" onclick="openModal('buy', 'Suunto M2')" data-i18n="btn_buy" class="btn-shine bg-brand-red hover:bg-brand-hover text-white text-xs font-bold uppercase px-5 py-2.5 rounded-md transition-all duration-300 shadow hover:shadow-md hover:shadow-red-500/30 active:scale-95">КУПИТЬ</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- === БЕГ КАРТОЧКА 1 === -->
+                <div class="card-item running hidden border-2 border-gray-100 hover:border-gray-300 p-5 rounded-xl perspective-1000 bg-white transition-all duration-300 hover:shadow-xl">
+                    <div class="card-inner relative transition-transform duration-500 transform-style-3d min-h-[440px] flex flex-col justify-between">
+                        <div class="card-front absolute inset-0 backface-hidden flex flex-col justify-between bg-white">
+                            <div class="text-center">
+                                <img src="photo.png" alt="Polar M430" class="h-48 mx-auto object-contain mb-4">
+                                <h3 class="font-bold text-base mb-1">Polar M430</h3>
+                                <p class="text-xs text-gray-500 font-normal px-2">Беговые часы со встроенным GPS</p>
+                            </div>
+                            <div class="mt-4">
+                                <button type="button" onclick="toggleCard(this)" data-i18n="btn_more" class="block mx-auto text-brand-red text-xs font-bold underline uppercase hover:text-brand-hover transition-colors mb-4">ПОДРОБНЕЕ</button>
+                                <hr class="my-3 border-gray-100">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <div class="text-xs text-gray-400 line-through">14 900 руб.</div>
+                                        <div class="text-base font-bold text-gray-900">12 490 руб.</div>
+                                    </div>
+                                    <button type="button" onclick="openModal('buy', 'Polar M430')" data-i18n="btn_buy" class="btn-shine bg-brand-red hover:bg-brand-hover text-white text-xs font-bold uppercase px-5 py-2.5 rounded-md transition-all duration-300 shadow hover:shadow-md hover:shadow-red-500/30 active:scale-95">КУПИТЬ</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-back absolute inset-0 backface-hidden rotate-y-180 flex flex-col justify-between bg-white p-2">
+                            <ul class="text-xs text-gray-600 space-y-2 list-disc pl-4 leading-relaxed font-medium">
+                                <li>Встроенный GPS модуль</li>
+                                <li>Отслеживание сна и активности 24/7</li>
+                                <li>Индивидуальные беговые программы</li>
+                            </ul>
+                            <div class="mt-4">
+                                <button type="button" onclick="toggleCard(this)" data-i18n="btn_back" class="block mx-auto text-brand-red text-xs font-bold underline uppercase hover:text-brand-hover transition-colors mb-4">НАЗАД</button>
+                                <hr class="my-3 border-gray-100">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <div class="text-xs text-gray-400 line-through">14 900 руб.</div>
+                                        <div class="text-base font-bold text-gray-900">12 490 руб.</div>
+                                    </div>
+                                    <button type="button" onclick="openModal('buy', 'Polar M430')" data-i18n="btn_buy" class="btn-shine bg-brand-red hover:bg-brand-hover text-white text-xs font-bold uppercase px-5 py-2.5 rounded-md transition-all duration-300 shadow hover:shadow-md hover:shadow-red-500/30 active:scale-95">КУПИТЬ</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- === БЕГ КАРТОЧКА 2 === -->
+                <div class="card-item running hidden border-2 border-gray-100 hover:border-gray-300 p-5 rounded-xl perspective-1000 bg-white transition-all duration-300 hover:shadow-xl">
+                    <div class="card-inner relative transition-transform duration-500 transform-style-3d min-h-[440px] flex flex-col justify-between">
+                        <div class="card-front absolute inset-0 backface-hidden flex flex-col justify-between bg-white">
+                            <div class="text-center">
+                                <img src="photo.png" alt="Garmin Forerunner 55" class="h-48 mx-auto object-contain mb-4">
+                                <h3 class="font-bold text-base mb-1">Garmin Forerunner 55</h3>
+                                <p class="text-xs text-gray-500 font-normal px-2">Идеальные часы для бега</p>
+                            </div>
+                            <div class="mt-4">
+                                <button type="button" onclick="toggleCard(this)" data-i18n="btn_more" class="block mx-auto text-brand-red text-xs font-bold underline uppercase hover:text-brand-hover transition-colors mb-4">ПОДРОБНЕЕ</button>
+                                <hr class="my-3 border-gray-100">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <div class="text-xs text-gray-400 line-through">19 500 руб.</div>
+                                        <div class="text-base font-bold text-gray-900">16 990 руб.</div>
+                                    </div>
+                                    <button type="button" onclick="openModal('buy', 'Garmin Forerunner 55')" data-i18n="btn_buy" class="btn-shine bg-brand-red hover:bg-brand-hover text-white text-xs font-bold uppercase px-5 py-2.5 rounded-md transition-all duration-300 shadow hover:shadow-md hover:shadow-red-500/30 active:scale-95">КУПИТЬ</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-back absolute inset-0 backface-hidden rotate-y-180 flex flex-col justify-between bg-white p-2">
+                            <ul class="text-xs text-gray-600 space-y-2 list-disc pl-4 leading-relaxed font-medium">
+                                <li>Рекомендации по ежедневному восстановлению</li>
+                                <li>Технология Garmin Coach</li>
+                                <li>До 2 недель работы в режиме смарт-часов</li>
+                            </ul>
+                            <div class="mt-4">
+                                <button type="button" onclick="toggleCard(this)" data-i18n="btn_back" class="block mx-auto text-brand-red text-xs font-bold underline uppercase hover:text-brand-hover transition-colors mb-4">НАЗАД</button>
+                                <hr class="my-3 border-gray-100">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <div class="text-xs text-gray-400 line-through">19 500 руб.</div>
+                                        <div class="text-base font-bold text-gray-900">16 990 руб.</div>
+                                    </div>
+                                    <button type="button" onclick="openModal('buy', 'Garmin Forerunner 55')" data-i18n="btn_buy" class="btn-shine bg-brand-red hover:bg-brand-hover text-white text-xs font-bold uppercase px-5 py-2.5 rounded-md transition-all duration-300 shadow hover:shadow-md hover:shadow-red-500/30 active:scale-95">КУПИТЬ</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- === ТРИАТЛОН КАРТОЧКА 1 === -->
+                <div class="card-item triathlon hidden border-2 border-gray-100 hover:border-gray-300 p-5 rounded-xl perspective-1000 bg-white transition-all duration-300 hover:shadow-xl">
+                    <div class="card-inner relative transition-transform duration-500 transform-style-3d min-h-[440px] flex flex-col justify-between">
+                        <div class="card-front absolute inset-0 backface-hidden flex flex-col justify-between bg-white">
+                            <div class="text-center">
+                                <img src="photo.png" alt="Garmin Forerunner 945" class="h-48 mx-auto object-contain mb-4">
+                                <h3 class="font-bold text-base mb-1">Garmin Forerunner 945</h3>
+                                <p class="text-xs text-gray-500 font-normal px-2">Мультиспортивные часы для триатлона</p>
+                            </div>
+                            <div class="mt-4">
+                                <button type="button" onclick="toggleCard(this)" data-i18n="btn_more" class="block mx-auto text-brand-red text-xs font-bold underline uppercase hover:text-brand-hover transition-colors mb-4">ПОДРОБНЕЕ</button>
+                                <hr class="my-3 border-gray-100">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <div class="text-xs text-gray-400 line-through">42 000 руб.</div>
+                                        <div class="text-base font-bold text-gray-900">37 500 руб.</div>
+                                    </div>
+                                    <button type="button" onclick="openModal('buy', 'Garmin Forerunner 945')" data-i18n="btn_buy" class="btn-shine bg-brand-red hover:bg-brand-hover text-white text-xs font-bold uppercase px-5 py-2.5 rounded-md transition-all duration-300 shadow hover:shadow-md hover:shadow-red-500/30 active:scale-95">КУПИТЬ</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-back absolute inset-0 backface-hidden rotate-y-180 flex flex-col justify-between bg-white p-2">
+                            <ul class="text-xs text-gray-600 space-y-2 list-disc pl-4 leading-relaxed font-medium">
+                                <li>Поддержка карт и цветной навигации</li>
+                                <li>Профили для плавания, велоспорта и бега</li>
+                                <li>Оценка показателя VO2 Max</li>
+                            </ul>
+                            <div class="mt-4">
+                                <button type="button" onclick="toggleCard(this)" data-i18n="btn_back" class="block mx-auto text-brand-red text-xs font-bold underline uppercase hover:text-brand-hover transition-colors mb-4">НАЗАД</button>
+                                <hr class="my-3 border-gray-100">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <div class="text-xs text-gray-400 line-through">42 000 руб.</div>
+                                        <div class="text-base font-bold text-gray-900">37 500 руб.</div>
+                                    </div>
+                                    <button type="button" onclick="openModal('buy', 'Garmin Forerunner 945')" data-i18n="btn_buy" class="btn-shine bg-brand-red hover:bg-brand-hover text-white text-xs font-bold uppercase px-5 py-2.5 rounded-md transition-all duration-300 shadow hover:shadow-md hover:shadow-red-500/30 active:scale-95">КУПИТЬ</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- === ТРИАТЛОН КАРТОЧКА 2 === -->
+                <div class="card-item triathlon hidden border-2 border-gray-100 hover:border-gray-300 p-5 rounded-xl perspective-1000 bg-white transition-all duration-300 hover:shadow-xl">
+                    <div class="card-inner relative transition-transform duration-500 transform-style-3d min-h-[440px] flex flex-col justify-between">
+                        <div class="card-front absolute inset-0 backface-hidden flex flex-col justify-between bg-white">
+                            <div class="text-center">
+                                <img src="photo.png" alt="Suunto 9 Baro" class="h-48 mx-auto object-contain mb-4">
+                                <h3 class="font-bold text-base mb-1">Suunto 9 Baro</h3>
+                                <p class="text-xs text-gray-500 font-normal px-2">Прочность и до 120 часов работы</p>
+                            </div>
+                            <div class="mt-4">
+                                <button type="button" onclick="toggleCard(this)" data-i18n="btn_more" class="block mx-auto text-brand-red text-xs font-bold underline uppercase hover:text-brand-hover transition-colors mb-4">ПОДРОБНЕЕ</button>
+                                <hr class="my-3 border-gray-100">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <div class="text-xs text-gray-400 line-through">48 000 руб.</div>
+                                        <div class="text-base font-bold text-gray-900">41 200 руб.</div>
+                                    </div>
+                                    <button type="button" onclick="openModal('buy', 'Suunto 9 Baro')" data-i18n="btn_buy" class="btn-shine bg-brand-red hover:bg-brand-hover text-white text-xs font-bold uppercase px-5 py-2.5 rounded-md transition-all duration-300 shadow hover:shadow-md hover:shadow-red-500/30 active:scale-95">КУПИТЬ</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-back absolute inset-0 backface-hidden rotate-y-180 flex flex-col justify-between bg-white p-2">
+                            <ul class="text-xs text-gray-600 space-y-2 list-disc pl-4 leading-relaxed font-medium">
+                                <li>Умные режимы работы от батареи</li>
+                                <li>Барометрический альтиметр</li>
+                                <li>Водонепроницаемость 100м</li>
+                            </ul>
+                            <div class="mt-4">
+                                <button type="button" onclick="toggleCard(this)" data-i18n="btn_back" class="block mx-auto text-brand-red text-xs font-bold underline uppercase hover:text-brand-hover transition-colors mb-4">НАЗАД</button>
+                                <hr class="my-3 border-gray-100">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <div class="text-xs text-gray-400 line-through">48 000 руб.</div>
+                                        <div class="text-base font-bold text-gray-900">41 200 руб.</div>
+                                    </div>
+                                    <button type="button" onclick="openModal('buy', 'Suunto 9 Baro')" data-i18n="btn_buy" class="btn-shine bg-brand-red hover:bg-brand-hover text-white text-xs font-bold uppercase px-5 py-2.5 rounded-md transition-all duration-300 shadow hover:shadow-md hover:shadow-red-500/30 active:scale-95">КУПИТЬ</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- REVIEWS SECTION (ВОЗВРАЩЕНО) -->
+    <section class="py-16 bg-white border-t border-gray-100">
+        <div class="max-w-4xl mx-auto px-4">
+            <h2 data-i18n="reviews_title" class="text-2xl md:text-3xl font-bold text-center uppercase tracking-wide mb-12">
+                ОТЗЫВЫ КЛИЕНТОВ
+            </h2>
+            <div class="space-y-10">
+                <!-- Review 1 -->
+                <div class="flex flex-col sm:flex-row items-center sm:items-start gap-6">
+                    <img src="photo_1.png" alt="Ирина Иванченко" class="w-24 h-24 rounded-full object-cover shrink-0 shadow-md">
+                    <div>
+                        <h3 class="font-bold text-base text-gray-900">Ирина Иванченко</h3>
+                        <span class="text-xs text-gray-400 font-medium block mb-2">2 полумарафона</span>
+                        <p class="text-xs sm:text-sm text-gray-700 leading-relaxed font-normal">
+                            Не знала, что себе купить - обратилась к ребятам из RunSmart - подобрали пульсометр, который подошел именно под мои задачи и финансовые возможности. Через некоторое время решила обновить гаджет - не раздумывая обратилась туда же.<br><br>
+                            Новые пробежки - новый результат!<br>
+                            Спасибо, RunSmart!
+                        </p>
+                    </div>
+                </div>
+                <hr class="border-gray-200">
+                <!-- Review 2 -->
+                <div class="flex flex-col sm:flex-row items-center sm:items-start gap-6">
+                    <img src="photo_2.png" alt="Иван Прошкин" class="w-24 h-24 rounded-full object-cover shrink-0 shadow-md">
+                    <div>
+                        <h3 class="font-bold text-base text-gray-900">Иван Прошкин</h3>
+                        <span class="text-xs text-gray-400 font-medium block mb-2">10 км</span>
+                        <p class="text-xs sm:text-sm text-gray-700 leading-relaxed font-normal">
+                            Крутая вещь этот пульсометр! Раньше бегал без него. Оказывается только хуже себе делал.<br>
+                            Купил пульсометр, ещё подарок получили консультацию. Со мной вместе провели первую тренировку, научили пользоваться новым гаджетом.<br><br>
+                            С ними подготовился к своему первому полумарафону! Спасибо!!!
+                        </p>
+                    </div>
+                </div>
+                <hr class="border-gray-200">
+                <!-- Review 3 -->
+                <div class="flex flex-col sm:flex-row items-center sm:items-start gap-6">
+                    <img src="photo_3.png" alt="Юлия Глотова" class="w-24 h-24 rounded-full object-cover shrink-0 shadow-md">
+                    <div>
+                        <h3 class="font-bold text-base text-gray-900">Юлия Глотова</h3>
+                        <span class="text-xs text-gray-400 font-medium block mb-2">2 полумарафона</span>
+                        <p class="text-xs sm:text-sm text-gray-700 leading-relaxed font-normal">
+                            Долго не могла начать бегать, так как до этого несколько раз начинала, но становилось тяжело и я бросала. От друзей услышала о RunSmart и о беге с контролем пульса и решила попробовать.<br><br>
+                            Позвонила, ребята поинтересовались моими целями и подобрали очень интересный вариант. Теперь бегаю и наслаждаюсь бегом!<br><br>
+                            Спасибо!!!
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- MAP & CONTACTS SECTION -->
+    <section class="relative w-full h-[550px] overflow-hidden">
+        <iframe 
+            src="https://yandex.ru/map-widget/v1/?um=constructor%3A0c660f7b054ba0bc9c4f1cb90c889f8d5e1823db2e185e054bdf1d0725518b5c&amp;source=constructor&amp;ll=37.649666%2C55.683713&amp;z=16&amp;pt=37.649666%2C55.683713%2Cpm2rdm" 
+            width="100%" 
+            height="100%" 
+            frameborder="0" 
+            allowfullscreen="true"
+            class="w-full h-full border-0">
+        </iframe>
+
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 z-10 bg-brand-red text-white p-8 md:p-10 shadow-2xl w-full max-w-md text-center rounded-b-xl md:rounded-b-2xl">
+            <address data-i18n="address" class="not-italic text-sm sm:text-base font-semibold leading-snug mb-3">
+                Москва, 1-й Нагатинский проезд, д. 10, стр. 1
+            </address>
+
+            <a href="tel:+74999228974" class="block text-xl sm:text-2xl font-black tracking-wide hover:text-gray-200 transition-colors mb-6">
+                8 (499) 922-89-74
+            </a>
+
+            <div class="flex items-center justify-center gap-4">
+                <a href="#" class="w-11 h-11 rounded-full border-2 border-white/80 hover:border-white flex items-center justify-center text-white transition-all duration-300 hover:scale-110">
+                    <i class="fab fa-facebook-f text-base"></i>
+                </a>
+                <a href="#" class="w-11 h-11 rounded-full border-2 border-white/80 hover:border-white flex items-center justify-center text-white transition-all duration-300 hover:scale-110">
+                    <i class="fab fa-instagram text-base"></i>
+                </a>
+                <a href="#" class="w-11 h-11 rounded-full border-2 border-white/80 hover:border-white flex items-center justify-center text-white transition-all duration-300 hover:scale-110">
+                    <i class="fab fa-pinterest-p text-base"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ПЛАВАЮЩАЯ КНОПКА «НАВЕРХ» -->
+    <a href="#top" id="scrollTopBtn" title="Наверх" class="btn-shine fixed bottom-8 right-8 z-40 hidden w-12 h-12 md:w-14 md:h-14 bg-gradient-to-r from-brand-red to-red-600 hover:from-brand-hover hover:to-red-700 text-white rounded-full flex items-center justify-center shadow-2xl shadow-red-600/50 hover:shadow-red-600/80 transition-all duration-300 hover:scale-110 active:scale-90 border-2 border-white/20 focus:outline-none">
+        <i class="fas fa-chevron-up text-lg md:text-xl"></i>
+    </a>
+
+    <!-- MODAL POPUP -->
+    <div id="modal" class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 transition-all duration-300">
+        <div class="bg-white rounded-xl p-6 sm:p-8 max-w-sm w-full relative shadow-2xl transform transition-all duration-300 scale-100">
+            <button type="button" onclick="closeModal()" class="absolute top-3 right-4 text-gray-400 hover:text-gray-800 text-2xl font-bold transition-colors">&times;</button>
+            <h3 id="modalTitle" class="text-lg font-bold text-center text-gray-900 uppercase mb-2">Заказать консультацию</h3>
+            <p id="modalSubtitle" class="text-xs text-center text-gray-500 mb-6">Заполните форму, и мы свяжемся с вами</p>
+            
+            <form onsubmit="handleSubmit(event)" class="flex flex-col gap-3">
+                <input type="text" placeholder="Ваше имя" required class="px-4 py-3 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-brand-red">
+                <input type="tel" placeholder="Ваш телефон" required class="px-4 py-3 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-brand-red">
+                <input type="email" placeholder="Ваш E-mail" required class="px-4 py-3 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-brand-red">
+                
+                <button type="submit" data-i18n="btn_submit" class="btn-shine mt-2 bg-gradient-to-r from-brand-red to-red-600 hover:from-brand-hover hover:to-red-700 text-white text-xs font-bold uppercase tracking-wider py-3.5 rounded-md transition-all duration-300 shadow-md shadow-red-500/30 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 active:scale-95">
+                    Отправить
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT MULTI-LANGUAGE & UI LOGIC -->
+    <script>
+        let currentLang = 'ru';
+
+        // Dictionary for Multi-language support (RU / EN / KK)
+        const translations = {
+            ru: {
+                logo_subtitle: "Подбор пульсометра",
+                official_rep: "Официальный представитель",
+                btn_call: "заказать звонок",
+                main_title: "Подбор пульсометра",
+                main_subtitle: "с учетом вашего уровня подготовки",
+                feature_1: "Время подбора:<br>10 минут",
+                feature_2: "Бесплатная<br>доставка",
+                feature_3: "Ответим<br>на все вопросы",
+                btn_consult: "заказать консультацию",
+                or: "или",
+                go_to_catalog: "перейти в каталог",
+                advantages_title: "НАШИ ПРЕИМУЩЕСТВА",
+                adv_1_title: "Делимся опытом",
+                adv_1_text: "Наши сотрудники имеют опыт бега на марафонах или в триатлоне, поэтому они изнутри знают всё о пульсометрах и помогут сделать правильный выбор.",
+                adv_2_title: "Заботимся о здоровье",
+                adv_2_text: "Мы работаем для того, чтобы ваши занятия спортом шли на пользу вашему здоровью и приносили радость вам и вашим близким!",
+                adv_3_title: "Учим бегать",
+                adv_3_text: "Помогаем с обучением правильной технике бега! Дружим с крупнейшей школой бега - I LOVE RUNNING.",
+                form_title: "ПОЛУЧИТЕ БЕСПЛАТНУЮ КОНСУЛЬТАЦИЮ<br>ПО ПОДБОРУ ПУЛЬСОМЕТРА",
+                form_subtitle: "Просто заполните форму заявки<br>и мы перезвоним вам в течении 10 минут",
+                catalog_title: "КАТАЛОГ ПУЛЬСОМЕТРОВ",
+                tab_fitness: "Для фитнеса",
+                tab_running: "Для бега",
+                tab_triathlon: "Для триатлона",
+                card_desc_1: "Для первых шагов в тренировках по пульсу",
+                btn_more: "ПОДРОБНЕЕ",
+                btn_back: "НАЗАД",
+                btn_buy: "КУПИТЬ",
+                reviews_title: "ОТЗЫВЫ КЛИЕНТОВ",
+                address: "Москва, 1-й Нагатинский проезд, д. 10, стр. 1",
+                btn_submit: "Отправить",
+                modal_call_title: "Заказать звонок",
+                modal_consult_title: "Заказать консультацию",
+                modal_buy_title: "Ваш заказ",
+                modal_subtitle: "Заполните форму, и мы свяжемся с вами",
+                alert_success: "Спасибо! Ваша заявка успешно отправлена."
+            },
+            en: {
+                logo_subtitle: "Heart Rate Monitor Selection",
+                official_rep: "Official Representative",
+                btn_call: "request a call",
+                main_title: "Heart Rate Monitor Selection",
+                main_subtitle: "based on your fitness level",
+                feature_1: "Selection time:<br>10 minutes",
+                feature_2: "Free<br>shipping",
+                feature_3: "We will answer<br>all questions",
+                btn_consult: "get a consultation",
+                or: "or",
+                go_to_catalog: "go to catalog",
+                advantages_title: "OUR ADVANTAGES",
+                adv_1_title: "Sharing Experience",
+                adv_1_text: "Our team has experience running marathons and triathlons, so they know everything about heart rate monitors from the inside.",
+                adv_2_title: "Caring About Health",
+                adv_2_text: "We work to ensure your sports activities benefit your health and bring joy to you and your loved ones!",
+                adv_3_title: "Teaching Running",
+                adv_3_text: "We help with learning proper running technique! Partners with the top running school - I LOVE RUNNING.",
+                form_title: "GET A FREE CONSULTATION<br>ON SELECTING A HEART RATE MONITOR",
+                form_subtitle: "Just fill out the application form<br>and we will call you back within 10 minutes",
+                catalog_title: "MONITOR CATALOG",
+                tab_fitness: "For Fitness",
+                tab_running: "For Running",
+                tab_triathlon: "For Triathlon",
+                card_desc_1: "For first steps in heart rate training",
+                btn_more: "MORE INFO",
+                btn_back: "BACK",
+                btn_buy: "BUY NOW",
+                reviews_title: "CUSTOMER REVIEWS",
+                address: "Moscow, 1st Nagatinsky proezd, 10, bld. 1",
+                btn_submit: "Submit",
+                modal_call_title: "Request a Call",
+                modal_consult_title: "Request Consultation",
+                modal_buy_title: "Your Order",
+                modal_subtitle: "Fill out the form and we will contact you",
+                alert_success: "Thank you! Your request has been sent successfully."
+            },
+            kk: {
+                logo_subtitle: "Пульсометр таңдау",
+                official_rep: "Ресми өкіл",
+                btn_call: "қоңырауға тапсырыс",
+                main_title: "Пульсометр таңдау",
+                main_subtitle: "сіздің дайындық деңгейіңізге сәйкес",
+                feature_1: "Таңдау уақыты:<br>10 минут",
+                feature_2: "Тегін<br>жеткізу",
+                feature_3: "Барлық сұрақтарға<br>жауап береміз",
+                btn_consult: "кеңес алу",
+                or: "немесе",
+                go_to_catalog: "каталогқа өту",
+                advantages_title: "БІЗДІҢ АРТЫҚШЫЛЫҚТАРЫМЫЗ",
+                adv_1_title: "Тәжірибемен бөлісеміз",
+                adv_1_text: "Біздің қызметкерлер марафондар мен триатлондарға қатысқан, сондықтан пульсометрлер туралы барлығын біледі.",
+                adv_2_title: "Денсаулыққа қамқорлық",
+                adv_2_text: "Спортпен шұғылдануыңыз денсаулығыңызға пайда әкеліп, қуаныш сыйлауы үшін жұмыс істейміз!",
+                adv_3_title: "Жүгіруді үйретеміз",
+                adv_3_text: "Дұрыс жүгіру техникасын үйренуге көмектесеміз! I LOVE RUNNING мектебінің серіктесіміз.",
+                form_title: "ТЕГІН КЕҢЕС АЛЫҢЫЗ<br>ПУЛЬСОМЕТР ТАҢДАУ БОЙЫНША",
+                form_subtitle: "Өтінім формасын толтырыңыз<br>10 минут ішінде қайта қоңырау шаламыз",
+                catalog_title: "ПУЛЬСОМЕТРЛЕР КАТАЛОГЫ",
+                tab_fitness: "Фитнес үшін",
+                tab_running: "Жүгіру үшін",
+                tab_triathlon: "Триатлон үшін",
+                card_desc_1: "Тамыр соғуы бойынша жаттығулардың алғашқы қадамдары үшін",
+                btn_more: "ТОЛЫҒЫРАҚ",
+                btn_back: "АРТҚА",
+                btn_buy: "САТЫП АЛУ",
+                reviews_title: "КЛИЕНТТЕРДІҢ ПІКІРЛЕРІ",
+                address: "Мәскеу, 1-ші Нагатинский өткелі, 10, 1 ғ.",
+                btn_submit: "Жіберу",
+                modal_call_title: "Қоңырауға тапсырыс",
+                modal_consult_title: "Кеңес алу",
+                modal_buy_title: "Сіздің тапсырысыңыз",
+                modal_subtitle: "Форманы толтырыңыз, біз хабарласамыз",
+                alert_success: "Рахмет! Тапсырысыңыз сәтті жіберілді."
+            }
+        };
+
+        // Function to Switch Languages
+        function setLanguage(lang) {
+            currentLang = lang;
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.className = "lang-btn px-2.5 py-1 rounded-full text-gray-300 hover:text-white transition-all duration-300";
+            });
+            const activeBtn = document.getElementById(lang-${lang});
+            if (activeBtn) {
+                activeBtn.className = "lang-btn px-2.5 py-1 rounded-full bg-brand-red text-white transition-all duration-300 shadow-sm";
+            }
+
+            const elements = document.querySelectorAll('[data-i18n]');
+            elements.forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[lang] && translations[lang][key]) {
+                    el.innerHTML = translations[lang][key];
+                }
+            });
+        }
+
+        // Modal Functions
+        function openModal(type = 'consult', item = '') {
+            const modal = document.getElementById('modal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalSubtitle = document.getElementById('modalSubtitle');
+
+            if (type === 'call') {
+                modalTitle.innerText = translations[currentLang].modal_call_title;
+            } else if (type === 'buy') {
+                modalTitle.innerText = ${translations[currentLang].modal_buy_title}: ${item};
+            } else {
+                modalTitle.innerText = translations[currentLang].modal_consult_title;
+            }
+
+            modalSubtitle.innerText = translations[currentLang].modal_subtitle;
+            if (modal) modal.classList.remove('hidden');
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('modal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        function handleSubmit(e) {
+            e.preventDefault();
+            alert(translations[currentLang].alert_success);
+            closeModal();
+        }
+
+        // Slider Functionality
+        let currentSlide = 0;
+        const track = document.getElementById('sliderTrack');
+        const totalSlides = track ? track.children.length : 0;
+
+        function moveSlide(direction) {
+            currentSlide = (currentSlide + direction + totalSlides) % totalSlides;
+            if (track) {
+                track.style.transform = translateX(-${currentSlide * 100}%);
+            }
+        }
+
+        // Toggle Card Flip Function
+        function toggleCard(btn) {
+            const cardInner = btn.closest('.card-inner');
+            if (cardInner) {
+                cardInner.classList.toggle('flipped');
+            }
+        }
+
+        // Catalog Tab Switching
+        function switchTab(category) {
+            const buttons = document.querySelectorAll('.tab-btn');
+            buttons.forEach(btn => {
+                btn.className = "tab-btn border-2 border-gray-300 text-gray-500 -skew-x-12 px-6 py-3 text-xs sm:text-sm font-bold uppercase hover:bg-gray-100 hover:border-gray-400 hover:text-gray-700 transition-all duration-300 hover:-translate-y-0.5";
+            });
+
+            const activeBtn = document.getElementById(tab-${category});
+            if (activeBtn) {
+                activeBtn.className = "tab-btn bg-gradient-to-r from-brand-red to-red-600 text-white -skew-x-12 px-6 py-3 text-xs sm:text-sm font-bold uppercase transition-all duration-300 shadow-md shadow-red-500/20 hover:-translate-y-0.5";
+            }
+
+            const cards = document.querySelectorAll('.card-item');
+            cards.forEach(card => {
+                if (card.classList.contains(category)) {
+                    card.classList.remove('hidden');
+                    card.style.display = 'block';
+                } else {
+                    card.classList.add('hidden');
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // Scroll to Top Button Visibility
+        const scrollTopBtn = document.getElementById('scrollTopBtn');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 400) {
+                scrollTopBtn.classList.remove('hidden');
+                scrollTopBtn.classList.add('flex');
+            } else {
+                scrollTopBtn.classList.add('hidden');
+                scrollTopBtn.classList.remove('flex');
+            }
+        });
+
+        // Close modal on backdrop click
+        window.onclick = function(e) {
+            const modal = document.getElementById('modal');
+            if (e.target === modal) {
+                closeModal();
+            }
+        }
+    </script>
+</body>
+</html>
